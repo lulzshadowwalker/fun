@@ -68,6 +68,9 @@ function love.load()
 	y = love.graphics.getHeight() / 2 - frame_height / 2
 
 	currentFrame = 1
+
+  --  NOTE: "A good rule of thumb is to use stream for music files and static for all short sound effects. Basically, you want to avoid loading large files at once."
+  sfx = love.audio.newSource('assets/sound/sfx.ogg', 'static')
 end
 
 function love.update(dt)
@@ -80,16 +83,28 @@ function love.draw()
 	--  NOTE: Approach no. 1
 	-- love.graphics.draw(frames[math.floor(currentFrame) % #frames + 1], x, y)
 
-	love.graphics.draw(sprite, frames[math.floor(currentFrame) % #frames + 1], x, y)
+  local current = frames[math.floor(currentFrame) % #frames + 1]
+	love.graphics.draw(sprite, current, x, y)
 	love.graphics.print("FPS: " .. math.ceil(fps), 10, 10)
+
+  local _, _, _, current_height = current:getViewport()
+  love.graphics.print("Press 's' to play SFX", x, y + current_height + 20)
+
+
 end
 
 function love.keypressed(key)
-	if key == "escape" then
+	if key == 'escape' then
 		love.event.quit()
 	end
 
-	if key == "r" then
+	if key == 'r' then
 		love.load()
 	end
+
+  if key == 's' then
+    -- love.audio.play(sfx)
+    -- or ..
+    sfx:play()
+  end
 end
