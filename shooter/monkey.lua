@@ -44,3 +44,9 @@ end
 function Monkey:draw()
     love.graphics.draw(self.image, self.x, self.y, 0, self.scale, self.scale)
 end
+
+function Monkey:keypressed(key)
+    if key == 'space' then
+        table.insert(Bullets, Bullet(self.x + self.width / 2, self.y + self.height / 2)) 
+    end
+end
