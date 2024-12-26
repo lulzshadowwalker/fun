@@ -3,7 +3,7 @@ function love.load()
     Circle.radius = 10
     Circle.x = love.graphics.getWidth() / 2 
     Circle.y = love.graphics.getHeight() / 2
-    Circle.speed = 350
+    Circle.speed = 750
 
     Arrow = {}
     Arrow.image = love.graphics.newImage('arrow.png')

@@ -25,6 +25,7 @@ sheeps = {}
 frames = 0
 fruits = { "banana", "monkey", "strawberry" }
 start = true
+fps = 0
 
 --  NOTE: Damb, I think I really like it :D
 
@@ -32,9 +33,9 @@ function love.load()
 	--  NOTE: For collision detection
 	r1 = {
 		x = 10,
-		y = 100,
+		y = 200,
 		width = 100,
-		height = 100,
+		height = 200,
 	}
 
 	r2 = {
@@ -48,15 +49,17 @@ function love.load()
 	-- spawn the first rect
 	-- shapes.spawn()
 
-	-- for i = 1, 1000 do
-	-- 	sheeps.spawn()
-	-- end
+	for i = 1, 1000 do
+		sheeps.spawn()
+	end
 
 	-- tick = require 'tick'
 	-- tick.delay(function() start = true end, 2)
 end
 
 function love.update(dt)
+	fps = 1 / dt
+
 	r1.x = r1.x + 100 * dt
 
 	--  NOTE: Do not process anything if the game hasn't started yet
@@ -96,17 +99,18 @@ function love.update(dt)
 
 	for i, v in ipairs(sheeps) do
 		v.y = v.y + v.speed * dt
+
+		if v.y > love.graphics.getHeight() then
+			table.remove(sheeps, i)
+		end
 	end
 end
 
 function love.draw()
-	--We create a local variable called mode
 	local mode
 	if checkCollision(r1, r2) then
-		--If there is collision, draw the rectangles filled
 		mode = "fill"
 	else
-		--else, draw the rectangles as a line
 		mode = "line"
 	end
 
@@ -119,6 +123,8 @@ function love.draw()
 
 	love.graphics.print("Frames: " .. frames, 20, 20)
 	love.graphics.print("Greetings, " .. name .. "!" .. " (nickname: " .. nickname .. ")", 20, 40)
+	love.graphics.print("FPS: " .. fps, 20, 60)
+	love.graphics.print("Sheeps: " .. #sheeps, 20, 80)
 
 	if not start then
 		love.graphics.print("Get Ready ...", 400, 300)
@@ -133,7 +139,12 @@ function love.draw()
 	love.graphics.setColor(1, 1, 1, 0.65)
 	for i, v in ipairs(sheeps) do
 		-- love.graphics.rectangle("line", v.x, v.y, v.w, v.h)
+		if checkCollision(r1, v) then
+			love.graphics.setColor(0, 0.5, 0.5, 0.5)
+		end
+
 		love.graphics.draw(sheep, v.x, v.y, v.rotation, v.scaleX, v.scaleY, v.originX, v.originY)
+		love.graphics.setColor(1, 1, 1, 1)
 	end
 	love.graphics.setColor(1, 1, 1, 1)
 end
@@ -161,11 +172,12 @@ function sheeps.spawn()
 		rotation = 0,
 		originX = sheep:getWidth() / 2,
 		originY = sheep:getHeight() / 2,
+    width = sheep:getWidth(),
+    height = sheep:getHeight(),
 	})
 end
 
 function checkCollision(a, b)
-	--With locals it's common usage to use underscores instead of camelCasing
 	local a_left = a.x
 	local a_right = a.x + a.width
 	local a_top = a.y
