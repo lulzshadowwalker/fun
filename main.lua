@@ -80,15 +80,24 @@ function love.update(dt)
 	end
 
 	if love.keyboard.isDown("r") then
-		print("welp, that's a little weird :D")
+		-- print("welp, that's a little weird :D")
 
-		for i = 1, #shapes do
-			table.remove(shapes, i)
-		end
+		-- for i = 1, #shapes do
+		-- 	table.remove(shapes, i)
+		-- end
 
-		for i = 1, #sheeps do
-			table.remove(sheeps, i)
-		end
+		-- for i = 1, #sheeps do
+		-- 	table.remove(sheeps, i)
+		-- end
+    --
+
+    for i = #shapes, 1, -1 do
+      table.remove(shapes, i)
+    end
+
+    for i = #sheeps, 1, -1 do
+      table.remove(sheeps, i)
+    end
 	end
 
 	if love.keyboard.isDown("q") then
