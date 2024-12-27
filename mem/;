@@ -26,17 +26,10 @@ function love.load()
 
 		data = Lume.deserialize(file)
 
-    Score1 = data.score1
-    Score2 = data.score2
-
 		--Apply the player info
-		Player1.x = data.player1.x
-		Player1.y = data.player1.y
-		Player1.size = data.player1.size
-
-    Player2.x = data.player2.x
-    Player2.y = data.player2.y
-    Player2.size = data.player2.size
+		Player1.x = data.player.x
+		Player1.y = data.player.y
+		Player1.size = data.player.size
 
 		for i, v in ipairs(data.coins) do
 			Coins[i] = {
@@ -101,7 +94,7 @@ function love.update(dt)
 		love.event.quit("restart")
 	end
 
-	if love.keyboard.isDown("p") then
+	if love.keyboard.isDown("s") then
 		save()
 	end
 
@@ -109,12 +102,12 @@ function love.update(dt)
 		local coin = Coins[i]
 		if collides(Player1, coin) then
 			table.remove(Coins, i)
-			Player1.size = Player1.size + 0.05
+			Player1.size = Player1.size + 0.1
 			Score1 = Score1 + 1
 			ShakeDuration = 0.3
 		elseif collides(Player2, coin) then
 			table.remove(Coins, i)
-			Player2.size = Player2.size + 0.05
+			Player2.size = Player2.size + 0.1
 			Score2 = Score2 + 1
 			ShakeDuration = 0.3
 		end
@@ -126,23 +119,19 @@ function love.update(dt)
 end
 
 function love.draw()
-  --  NOTE: Player 1 Split
 	love.graphics.setCanvas(ScreenCanvas)
 	love.graphics.clear()
-	drawGame(Player1)
+
+	drawGame()
+
+	--  NOTE: Approach 1
+	-- love.graphics.translate(player.x - 400, player.y - 300)
+	-- or
+	-- love.graphics.origin()
+
 	love.graphics.setCanvas()
 	love.graphics.draw(ScreenCanvas)
 
-  --  NOTE: Player 2 Split
-	love.graphics.setCanvas(ScreenCanvas)
-	love.graphics.clear()
-	drawGame(Player2)
-	love.graphics.setCanvas()
-	love.graphics.draw(ScreenCanvas, 400)
-
-  love.graphics.line(400, 0, 400, 600)
-
-  --  NOTE: Print scores
 	love.graphics.setColor(1, 0, 0)
 	love.graphics.print("Score 1: " .. Score1, 10, 10, 0, 2, 2)
 	love.graphics.print("Score 2: " .. Score2, 10, 40, 0, 2, 2)
@@ -157,7 +146,7 @@ end
 function drawGame(target)
 	--  NOTE: Camera
 	love.graphics.push() --  NOTE: Approach 2
-	love.graphics.translate(-target.x + 200, -target.y + 300)
+	love.graphics.translate(-Player1.x + 200, -Player1.y + 300)
 
 	if ShakeDuration > 0 then
 		local dx = love.math.random(-5, 5)
@@ -180,43 +169,21 @@ function drawGame(target)
 		Player1.image:getHeight() / 2
 	)
 
-	love.graphics.draw(
-		Player2.image,
-		Player2.x,
-		Player2.y,
-		0,
-		1,
-		1,
-		Player2.image:getWidth() / 2,
-		Player2.image:getHeight() / 2
-	)
-
 	for i = 1, #Coins do
 		local coin = Coins[i]
 		love.graphics.circle("line", coin.x, coin.y, coin.size)
 		love.graphics.draw(coin.image, coin.x, coin.y, 0, 1, 1, coin.image:getWidth() / 2, coin.image:getHeight() / 2)
 	end
 	love.graphics.pop() --  NOTE: Approach 2
-
-	--  NOTE: Approach 1
-	-- love.graphics.translate(player.x - 400, player.y - 300)
-	-- or
-	-- love.graphics.origin()
 end
 
 function save()
 	data = {}
 
-	data.player1 = {
+	data.player = {
 		x = Player1.x,
 		y = Player1.y,
 		size = Player1.size,
-	}
-
-	data.player2 = {
-		x = Player2.x,
-		y = Player2.y,
-		size = Player2.size,
 	}
 
 	data.coins = {}
@@ -226,9 +193,6 @@ function save()
 			y = Coins[i].y,
 		}
 	end
-
-  data.score1 = Score1
-  data.score2 = Score2
 
 	local serialized = Lume.serialize(data)
 	love.filesystem.write("save", serialized)
